@@ -1,7 +1,7 @@
 # MyConkyConfig
 Another Conky configuration skin showing system informations, weather, Market Indexes and Exchange Rates.
 
-[![screenshot](https://github.com/rpungartnik/recipes/MyConkyConfig/blob/master/screenshot-thumb.png)](https://github.com/rpungartnik/recipes/MyConkyConfig/blob/master/screenshot.png)
+[![screenshot](https://github.com/rpungartnik/recipes/MyConkyConfig/master/screenshot-thumb.png)](https://github.com/rpungartnik/recipes/MyConkyConfig/master/screenshot.png)
 
 ## Skins
 ### System Information
@@ -49,5 +49,5 @@ $ sudo apt install curl
 ```
 
 ## Images
-The folder wallpaper has the image I'm using and a suggestion for the lock screen.
+The folder [wallpaper](https://github.com/rpungartnik/MyConkyConfig/tree/master/wallpaper) has the image I'm using and a suggestion for the lock screen.
 
