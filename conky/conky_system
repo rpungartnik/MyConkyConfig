@@ -1,0 +1,100 @@
+conky.config = {
+	background = false,
+	update_interval = 1,
+
+	cpu_avg_samples = 2,
+	net_avg_samples = 2,
+	temperature_unit = 'celsius',
+
+	double_buffer = true,
+	no_buffers = true,
+	text_buffer_size = 2048,
+
+	gap_x = 0,
+	gap_y = 40,
+	minimum_width = 250, minimum_height = 1080,
+	maximum_width = 250,
+	own_window = true,
+	own_window_class = 'conky',
+	own_window_argb_visual = true,
+	own_window_argb_value = 120,
+	own_window_hints = 'undecorated,below,sticky,skip_taskbar,skip_pager',
+	own_window_colour = '#484B52',
+	background = false,
+	border_inner_margin = 0,
+	border_outer_margin = 0,
+	alignment = 'top_right',
+
+	draw_shades = false,
+	draw_outline = false,
+	draw_borders = false,
+	draw_graph_borders = true,
+
+	override_utf8_locale = true,
+	use_xft = true,
+	font = 'DejaVu Sans:size=9',
+	xftalpha = 0.5,
+	uppercase = false,
+
+	default_color = 'white',
+        color1 = 'blue',
+        color2 = 'grey',
+
+
+};
+
+conky.text = [[
+${goto 5}${font zekton:style=Bold:pixelsize=14}${color2}SYSTEM${font  Snap.se:size=8} ${color1}${hr}${color}
+${goto 10}${font OpenLogos:size=12}J${font}   OS: ${execi 10800 cat /etc/issue.net} ${machine}
+${goto 10}${font StyleBats:size=12}q${font}   Kernel: ${kernel}
+${goto 10}${font StyleBats:size=12}x${font}   Hostname: ${nodename}
+${goto 10}${font StyleBats:size=12}p${font}   Uptime: ${uptime}
+${goto 10}${font StyleBats:size=12}k${font}   Processes: ${processes} ($running_processes running)
+${voffset -5}
+${goto 5}${font zekton:style=Bold:pixelsize=14}${color2}SYSTEM LOAD${font  Snap.se:size=8} ${color1}${hr}${color}
+${goto 10}${font FontAwesome}${font}${font  Snap.se:size=8} Temp.Placa Mae: ${execi 5 sensors|grep 'temp1'| awk -F'+' '{print $2}' | awk -F'.' '{print $1}'} °C | CPU: ${execi 5 sensors|grep 'temp2'| awk -F'+' '{print $2}' | awk -F'.' '{print $1}'} °C
+${goto 10}${font FontAwesome}${font}${font  Snap.se:size=8} Load: ${loadavg} ${voffset -5}${cpugraph cpu0 15,107}
+${goto 10}${font Conky Icons by Carelli}A ${font}${font  Snap.se:size=8}Intel® Core™ i7-3770 CPU @ 3.40GHz
+${alignc}Package: ${execi 5 sensors|grep 'Package id 0'| awk -F'+' '{print $2}' | awk -F'.' '{print $1}'} °C
+${goto 10}Core 0: ${execi 5 sensors|grep 'Core 0'| awk -F'+' '{print $2}' | awk -F'.' '{print $1}'} °C ${goto 85} | CPU1: ${goto 127}${cpu cpu1}%${goto 160}${cpubar cpu1 7,30}${goto 195}${freq_g 1}GHz
+${goto 85} | CPU2: ${goto 127}${cpu cpu2}%${goto 160}${cpubar cpu2 7,30}${goto 195}${freq_g 2}GHz
+${goto 10}Core 1: ${execi 5 sensors|grep 'Core 1'| awk -F'+' '{print $2}' | awk -F'.' '{print $1}'} °C ${goto 85} | CPU3: ${goto 127}${cpu cpu3}%${goto 160}${cpubar cpu3 7,30}${goto 195}${freq_g 3}GHz
+${goto 85} | CPU4: ${goto 127}${cpu cpu4}%${goto 160}${cpubar cpu4 7,30}${goto 195}${freq_g 4}GHz
+${goto 10}Core 2: ${execi 5 sensors|grep 'Core 2'| awk -F'+' '{print $2}' | awk -F'.' '{print $1}'} °C ${goto 85} | CPU5: ${goto 127}${cpu cpu5}%${goto 160}${cpubar cpu5 7,30}${goto 195}${freq_g 5}GHz
+${goto 85} | CPU6: ${goto 127}${cpu cpu6}%${goto 160}${cpubar cpu6 7,30}${goto 195}${freq_g 6}GHz
+${goto 10}Core 3: ${execi 5 sensors|grep 'Core 3'| awk -F'+' '{print $2}' | awk -F'.' '{print $1}'} °C ${goto 85} | CPU7: ${goto 127}${cpu cpu7}%${goto 160}${cpubar cpu7 7,30}${goto 195}${freq_g 7}GHz 
+${goto 85} | CPU8: ${goto 127}${cpu cpu8}%${goto 160}${cpubar cpu8 7,30}${goto 195}${freq_g 8}GHz
+${goto 10}${font FontAwesome}${font}${font  Snap.se:size=8} $mem / $memmax ($memperc%) | Swap :${swapperc}%
+${memgraph}
+${voffset -5}
+${goto 5}${font zekton:style=Bold:pixelsize=14}${color2}TOP PROCESSES${font Snap.se:size=8} ${color1}${hr}${color}
+${goto 10}Highest CPU/MEM ${goto 135}  CPU ${goto 205}  MEM
+${goto 10}${top name 1}${goto 135}${top cpu 1}${goto 205}${top mem 1}
+${goto 10}${top name 2}${goto 135}${top cpu 2}${goto 205}${top mem 2}
+${goto 10}${top name 3}${goto 135}${top cpu 3}${goto 205}${top mem 3}
+${goto 10}${top name 4}${goto 135}${top cpu 4}${goto 205}${top mem 4}
+${goto 10}${top name 5}${goto 135}${top cpu 5}${goto 205}${top mem 5}
+${voffset -5}
+${goto 5}${font zekton:style=Bold:pixelsize=14}${color2}FILESYSTEM ${font Snap.se:size=8} ${color1}${hr}${color}
+${goto 10}${voffset 4}${font FontAwesome}${font}   Root: ${alignr}${fs_free /} / ${fs_size /}
+${goto 5}${voffset 4}${color1}${fs_bar /}${color}
+${goto 5}${font zekton:style=Bold:pixelsize=14}${color2}Connection${font  Snap.se:size=8} ${color1}${hr}${color}
+${font FontAwesome}${font}${font  Snap.se:size=8}${goto 20}Public IpV4: ${alignr}${execi 3600 wget -O - -q ipv4.icanhazip.com}
+${font FontAwesome}${font}${font  Snap.se:size=8}${goto 20}Public IpV6: ${alignr}${execi 3600 wget -O - -q ipv6.icanhazip.com}
+${voffset -5}
+${goto 5}${font zekton:style=Bold:pixelsize=14}${color2}Ethernet${font  Snap.se:size=8} ${color1}${hr}${color}
+${font FontAwesome}${font}${font  Snap.se:size=8}${goto 20}Eth0: ${alignr}${addr enp3s0}
+${font FontAwesome}${font}${font  Snap.se:size=8}${goto 20}Down ${downspeed enp3s0}/s ${alignr}${font FontAwesome}${font}${font  Snap.se:size=8}Up ${upspeed enp3s0}/s
+${downspeedgraph enp3s0 15,107} ${alignr}${upspeedgraph enp3s0 15,107}
+Total ${totaldown enp3s0} ${alignr}Total ${totalup enp3s0}
+${voffset -5}
+${goto 5}${font zekton:style=Bold:pixelsize=14}${color2}Wi-Fi${font  Snap.se:size=8} ${color1}${hr}${color}
+${goto 20}${font Conky Icons by Carelli}E${font}${font  Snap.se:size=8} WLAN  channel: ${wireless_channel wlxc04a00213231}, freq: ${wireless_freq wlxc04a00213231}
+${font FontAwesome}${font}${font  Snap.se:size=8}${goto 20}SSID: ${alignr}${wireless_essid wlxc04a00213231}
+${font FontAwesome}${font}${font  Snap.se:size=8}${goto 20}Signal: ${alignr}${wireless_link_qual wlxc04a00213231}%
+${font FontAwesome}${font}${font  Snap.se:size=8}${goto 20}Wlan0: ${alignr}${addr wlxc04a00213231}
+${font FontAwesome}${font}${font  Snap.se:size=8}${goto 20}Down ${downspeed wlxc04a00213231}/s ${alignr}${font FontAwesome}${font}${font  Snap.se:size=8}Up ${upspeed wlxc04a00213231}/s
+${downspeedgraph wlxc04a00213231 15,107} ${alignr}${upspeedgraph wlxc04a00213231 15,107}
+Total ${totaldown wlxc04a00213231} ${alignr}Total ${totalup wlxc04a00213231}
+
+]];
