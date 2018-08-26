@@ -1,7 +1,7 @@
 # MyConkyConfig
 Another Conky configuration skin showing system informations, weather, Market Indexes and Exchange Rates.
 
-[![screenshot](https://github.com/rpungartnik/MyConkyConfig/master/screenshot-thumb.png)](https://github.com/rpungartnik/MyConkyConfig/master/screenshot.png)
+[![screenshot](https://github.com/rpungartnik/MyConkyConfig/blob/master/screenshot-thumb.png)](https://github.com/rpungartnik/MyConkyConfig/blob/master/screenshot.png)
 
 ## Skins
 ### System Information
