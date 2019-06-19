@@ -32,19 +32,44 @@ conky.config = {
 	override_utf8_locale = true,
 
 	default_color = 'grey',
+
+-------------------------------------
+--  API Key
+-------------------------------------
+template6="92ac53328d93d46a334da209aa17a109",
+
+
+-------------------------------------
+--  City ID
+-------------------------------------
+template7="3459462",
+
+
+-------------------------------------
+--  Temp Unit (default, metric, imperial)
+-------------------------------------
+template8="metric",
+
+
+-------------------------------------
+--  Locale (e.g. "es_ES.UTF-8")
+--  Leave empty for default
+-------------------------------------
+template9="pt_BR.UTF8"
+
 };
 
 conky.text = [[
-${execi 1800 ~/.conky/UpdateWeather.sh}
-${font Open Sans Light:size=15}${execi 900 grep "yweather:location" ~/.cache/weather.xml | grep -o "city=\"[^\"]*\"" | grep -o "\"[^\"]*\"" | grep -o "[^\"]*"}, ${execi 900 grep "yweather:location" ~/.cache/weather.xml | grep -o "country=\"[^\"]*\"" | grep -o "\"[^\"]*\"" | grep -o "[^\"]*"}${font}${font Open Sans Light:size=70}${alignr}${execi 900 grep "yweather:condition" ~/.cache/weather.xml | grep -o "temp=\"[^\"]*\"" | grep -o "\"[^\"]*\"" | grep -o "[^\"]*"}°${font}${voffset -35}
-${font Open Sans Light:size=10}${execi 900 cp -f ~/.conky-google-now/$(grep "yweather:condition" ~/.cache/weather.xml | grep -o "code=\"[^\"]*\"" | grep -o "\"[^\"]*\"" | grep -o "[^\"]*").png ~/.cache/weather.png}${image ~/.cache/weather.png -p 0,45 -s 60x60}
+${execi 1800 ~/.conky/get_weather ${template6} ${template7} ${template8} ${template9}}
+${font Open Sans Light:size=15}${execi 900 jq -r .name ~/.cache/weather.json}, ${execi 900 jq -r .sys.country ~/.cache/weather.json}${font}${font Open Sans Light:size=70}${alignr}${execi 900 jq -r .main.temp ~/.cache/weather.json | awk '{print int($1+0.5)}' # round num}°${font}${voffset -35}
+${font Open Sans Light:size=10}${execi 900 cp -f ~/.conky/icons/64/$(jq .weather[0].id ~/.cache/weather.json).png ~/.cache/weather.png}${image ~/.cache/weather.png -p 0,45 -s 60x60}
 
-${execi 900 grep "yweather:condition" ~/.cache/weather.xml | grep -o "text=\"[^\"]*\"" | grep -o "\"[^\"]*\"" | grep -o "[^\"]*"}${image ~/.conky-google-now/wind.png -p 0,130 -s 15x15}
-${goto 35}${execi 900 grep "yweather:wind" ~/.cache/weather.xml | grep -o "speed=\"[^\"]*\"" | grep -o "\"[^\"]*\"" | grep -o "[^\"]*" | grep "[0-9]"} ${execi 900 grep "yweather:units" ~/.cache/weather.xml | grep -o "speed=\"[^\"]*\"" | grep -o "\"[^\"]*\"" | grep -o "[^\"]*" | grep -v "[0-9]"}${goto 170}Nascer do Sol: ${execi 900 grep "yweather:astronomy" ~/.cache/weather.xml | grep -o "sunrise=\"[^\"]*\"" | grep -o "\"[^\"]*\"" | grep -o "[^\"]*"}${image ~/.conky-google-now/humidity.png -p 0,150 -s 15x15}
-${goto 35}${execi 900 grep "yweather:atmosphere" ~/.cache/weather.xml | grep -o "humidity=\"[^\"]*\"" | grep -o "\"[^\"]*\"" | grep -o "[^\"]*"}%${goto 170}Por do Sol:       ${execi 900 grep "yweather:astronomy" ~/.cache/weather.xml | grep -o "sunset=\"[^\"]*\"" | grep -o "\"[^\"]*\"" | grep -o "[^\"]*"}${voffset 15}
-${goto 18}${execi 900 grep "yweather:forecast" ~/.cache/weather.xml | grep -o "day=\"[^\"]*\"" | grep -o "\"[^\"]*\"" | grep -o "[^\"]*" | awk 'NR==1'}${goto 88}${execi 900 grep "yweather:forecast" ~/.cache/weather.xml | grep -o "day=\"[^\"]*\"" | grep -o "\"[^\"]*\"" | grep -o "[^\"]*" | awk 'NR==2'}${goto 158}${execi 900 grep "yweather:forecast" ~/.cache/weather.xml | grep -o "day=\"[^\"]*\"" | grep -o "\"[^\"]*\"" | grep -o "[^\"]*" | awk 'NR==3'}${goto 228}${execi 900 grep "yweather:forecast" ~/.cache/weather.xml | grep -o "day=\"[^\"]*\"" | grep -o "\"[^\"]*\"" | grep -o "[^\"]*" | awk 'NR==4'}${goto 298}${execi 900 grep "yweather:forecast" ~/.cache/weather.xml | grep -o "day=\"[^\"]*\"" | grep -o "\"[^\"]*\"" | grep -o "[^\"]*" | awk 'NR==5'}
+${execi 900 jq -r .weather[0].description ~/.cache/weather.json | sed "s|\<.|\U&|g"}${image ~/.conky/icons/wind.png -p 0,130 -s 15x15}
+${goto 35}${execi 900 jq -r .wind.speed ~/.cache/weather.json} m/s${goto 195}Nascer do Sol: ${execi 900 date -d "@$(jq -r .sys.sunrise ~/.cache/weather.json)" +%-0H:%M}${image ~/.conky/icons/humidity.png -p 0,150 -s 15x15}
+${goto 35}${execi 900 jq -r .main.humidity ~/.cache/weather.json | awk '{print int($1+0.5)}' # round num}%${goto 195}Por do Sol:       ${execi 900 date -d "@$(jq -r .sys.sunset ~/.cache/weather.json)" +%-0H:%M}${voffset 15}
+${goto 18}${execi 900 date +%^a}${goto 88}${execi 900 date -d +1day +%^a}${goto 158}${execi 900 date -d +2day +%^a}${goto 228}${execi 900 date -d +3day +%^a}${goto 298}${execi 900 date -d +4day +%^a}
 
-${execi 900 cp -f ~/.conky-google-now/$(grep "yweather:forecast" ~/.cache/weather.xml | grep -o "code=\"[^\"]*\"" | grep -o "\"[^\"]*\"" | grep -o "[^\"]*" | awk 'NR==1').png ~/.cache/weather-1.png}${image ~/.cache/weather-1.png -p 0,200 -s 30x30}${execi 900 cp -f ~/.conky-google-now/$(grep "yweather:forecast" ~/.cache/weather.xml | grep -o "code=\"[^\"]*\"" | grep -o "\"[^\"]*\"" | grep -o "[^\"]*" | awk 'NR==2').png ~/.cache/weather-2.png}${image ~/.cache/weather-2.png -p 70,200 -s 30x30}${execi 900 cp -f ~/.conky-google-now/$(grep "yweather:forecast" ~/.cache/weather.xml | grep -o "code=\"[^\"]*\"" | grep -o "\"[^\"]*\"" | grep -o "[^\"]*" | awk 'NR==3').png ~/.cache/weather-3.png}${image ~/.cache/weather-3.png -p 140,200 -s 30x30}${execi 900 cp -f ~/.conky-google-now/$(grep "yweather:forecast" ~/.cache/weather.xml | grep -o "code=\"[^\"]*\"" | grep -o "\"[^\"]*\"" | grep -o "[^\"]*" | awk 'NR==4').png ~/.cache/weather-4.png}${image ~/.cache/weather-4.png -p 210,200 -s 30x30}${execi 900 cp -f ~/.conky-google-now/$(grep "yweather:forecast" ~/.cache/weather.xml | grep -o "code=\"[^\"]*\"" | grep -o "\"[^\"]*\"" | grep -o "[^\"]*" | awk 'NR==5').png ~/.cache/weather-5.png}${image ~/.cache/weather-5.png -p 280,200 -s 30x30}${voffset 20}${goto 20}${execi 900 grep "yweather:forecast" ~/.cache/weather.xml | grep -o "high=\"[^\"]*\"" | grep -o "\"[^\"]*\"" | grep -o "[^\"]*" | awk 'NR==1'}°${goto 90}${execi 900 grep "yweather:forecast" ~/.cache/weather.xml | grep -o "high=\"[^\"]*\"" | grep -o "\"[^\"]*\"" | grep -o "[^\"]*" | awk 'NR==2'}°${goto 160}${execi 900 grep "yweather:forecast" ~/.cache/weather.xml | grep -o "high=\"[^\"]*\"" | grep -o "\"[^\"]*\"" | grep -o "[^\"]*" | awk 'NR==3'}°${goto 230}${execi 900 grep "yweather:forecast" ~/.cache/weather.xml | grep -o "high=\"[^\"]*\"" | grep -o "\"[^\"]*\"" | grep -o "[^\"]*" | awk 'NR==4'}°${goto 300}${execi 900 grep "yweather:forecast" ~/.cache/weather.xml | grep -o "high=\"[^\"]*\"" | grep -o "\"[^\"]*\"" | grep -o "[^\"]*" | awk 'NR==5'}°
-${goto 20}${execi 900 grep "yweather:forecast" ~/.cache/weather.xml | grep -o "low=\"[^\"]*\"" | grep -o "\"[^\"]*\"" | grep -o "[^\"]*" | awk 'NR==1'}°${goto 90}${execi 900 grep "yweather:forecast" ~/.cache/weather.xml | grep -o "low=\"[^\"]*\"" | grep -o "\"[^\"]*\"" | grep -o "[^\"]*" | awk 'NR==2'}°${goto 160}${execi 900 grep "yweather:forecast" ~/.cache/weather.xml | grep -o "low=\"[^\"]*\"" | grep -o "\"[^\"]*\"" | grep -o "[^\"]*" | awk 'NR==3'}°${goto 230}${execi 900 grep "yweather:forecast" ~/.cache/weather.xml | grep -o "low=\"[^\"]*\"" | grep -o "\"[^\"]*\"" | grep -o "[^\"]*" | awk 'NR==4'}°${goto 300}${execi 900 grep "yweather:forecast" ~/.cache/weather.xml | grep -o "low=\"[^\"]*\"" | grep -o "\"[^\"]*\"" | grep -o "[^\"]*" | awk 'NR==5'}°
-${font Open Sans Light:size=6}${execi 900 grep "yweather:condition" ~/.cache/weather.xml | grep -o "date=\"[^\"]*\"" | grep -o "\"[^\"]*\"" | grep -o "[^\"]*"}${font}
+${execi 900 cp -f ~/.conky/icons/32/$(~/.conky/parse_weather 'first' '.weather[0].id' '0').png ~/.cache/weather-1.png}${image ~/.cache/weather-1.png -p 0,200 -s 30x30}${execi 900 cp -f ~/.conky/icons/32/$(~/.conky/parse_weather 'first' '.weather[0].id' '1').png ~/.cache/weather-2.png}${image ~/.cache/weather-2.png -p 70,200 -s 30x30}${execi 900 cp -f ~/.conky/icons/32/$(~/.conky/parse_weather 'first' '.weather[0].id' '2').png ~/.cache/weather-3.png}${image ~/.cache/weather-3.png -p 140,200 -s 30x30}${execi 900 cp -f ~/.conky/icons/32/$(~/.conky/parse_weather 'first' '.weather[0].id' '3').png ~/.cache/weather-4.png}${image ~/.cache/weather-4.png -p 210,200 -s 30x30}${execi 900 cp -f ~/.conky/icons/32/$(~/.conky/parse_weather 'first' '.weather[0].id' '4').png ~/.cache/weather-5.png}${image ~/.cache/weather-5.png -p 280,200 -s 30x30}${voffset 20}${goto 20}${execi 900 ~/.conky/parse_weather 'avg' '.main.temp_max' '0'}°${goto 90}${execi 900 ~/.conky/parse_weather 'avg' '.main.temp_max' '1'}°${goto 160}${execi 900 ~/.conky/parse_weather 'avg' '.main.temp_max' '2'}°${goto 230}${execi 900 ~/.conky/parse_weather 'avg' '.main.temp_max' '3'}°${goto 300}${execi 900 ~/.conky/parse_weather 'avg' '.main.temp_max' '4'}°
+${goto 20}${execi 900 ~/.conky/parse_weather 'avg' '.main.temp_min' '0'}°${goto 90}${execi 900 ~/.conky/parse_weather 'avg' '.main.temp_min' '1'}°${goto 160}${execi 900 ~/.conky/parse_weather 'avg' '.main.temp_min' '2'}°${goto 230}${execi 900 ~/.conky/parse_weather 'avg' '.main.temp_min' '3'}°${goto 300}${execi 900 ~/.conky/parse_weather 'avg' '.main.temp_min' '4'}°
+${font Open Sans Light:size=6}${execi 900 date -d "@$(jq -r .dt ~/.cache/weather.json)" +%c}${font}
 ]];

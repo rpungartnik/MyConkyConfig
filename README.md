@@ -1,40 +1,67 @@
 # MyConkyConfig
-Another Conky configuration skin showing system informations, weather, Market Indexes and Exchange Rates.
+Another [conky](https://github.com/brndnmtthws/conky) configuration skin showing system informations, weather, Market Indexes and Exchange Rates.
+
+* [Installation](#installation)
+* [System Information](#system-information)
+* [Weather](#weather)
+* [API-key](#api-key)
+* [City](#city)
+* [Language](#language)
+* [Market Indexes](#market-indexes)
+* [Requisites](#requisites)
+* [Images](#images)
+
+---
 
 [![screenshot](https://github.com/rpungartnik/MyConkyConfig/blob/master/screenshot-thumb.png)](https://github.com/rpungartnik/MyConkyConfig/blob/master/screenshot.png)
+
+---
+
+## Installation
+After downloading the project, move conky folder to you ~ dir.
+
+```
+$ mv conky ~/.conky
+```
+
+Inside .conky fonder you will find the script startconky.sh you can use to start conky on your system.
+
+---
 
 ## Skins
 ### System Information
 Show some important informations about system health.
 
 ### Weather
-Show current weather conditions from Yahoo! Weather System using google-now style icons.
+Show current weather conditions using [OpenWeatherMap](http://openweathermap.org/).
 
-To change weather location, you must edit conky/UpdateWeather.sh and locate the following string:
+This skin was based on [Harmattan](https://github.com/zagortenay333/Harmattan) configuration.
 
-```
-woeid%3D
-```
+#### Configuration
+##### API Key
+Register a private API key on [OpenWeatherMap](http://openweathermap.org/) to get weather data.
 
-The numbers after that string is the Yahoo woeid, you can find the Id of your location [here](http://woeid.rosselliot.co.nz/lookup/)
+Place the API key in the `template6` variable inside the `conkyrc_weather`file.
+
+##### City
+
+[Find the ID of your city](http://bulk.openweathermap.org/sample/) and place it inside the `template7` variable inside the `conkyrc_weather` file.
+
+##### Language
+
+By default this conky will use your default locale.
+
+Edit the `template9` variable in the `conkyrc_weather` file to change the language.
+
+[See the list of supported languages](http://openweathermap.org/current#multi)
 
 ### Market Indexes
 Show Market Indexes and Currency rates.
 
 This skin was based on [GH0st3rs](https://github.com/GH0st3rs/YahooFinance) work.
 
-## Installation
-After downloading the project, you need to rename the two folders
-
-```
-$ mv conky .conky
-$ mv conky-google-now .conky-google-now
-```
-
-Inside conky fonder you will find the script startconky.sh you can use to start conky on your system.
-
 ## Requisites:
- * Conky >= 1.10
+ * [conky](https://github.com/brndnmtthws/conky) >= 1.10
  * [Font Awesome](https://github.com/FortAwesome/Font-Awesome)
  * Pyton
 
@@ -46,6 +73,12 @@ $ sudo apt install python3-minimal
 
 ```
 $ sudo apt install curl
+```
+
+ * jq
+
+```
+$ sudo apt install jq
 ```
 
 ## Images
