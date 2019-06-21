@@ -78,6 +78,92 @@ get_avg_property () {
     LC_NUMERIC=C printf %.0f $res
 }
 
+# Currently, the free accounts on openweathermap.org only get a 5 day forecast
+# with data records for every 3 hours. so we have to compute the temp_min and
+# temp_max manually.
+get_min_property () {
+    local res=200
+
+    local prop="$1"
+    local day="$2"
+
+    local idx
+    idx=$(find_position "$day")
+
+    local time=0
+    local it=0
+
+    while true; do
+        [[ $time == "null" ]] && break
+
+        it=$(jq ".list[$idx]$prop" "$forecast")
+
+	LC_ALL=en_US.UTF-8 printf -v intx '%.*f' 0 $it
+
+	if [ $intx -lt $res ] 
+	then
+		res=$intx
+	fi
+
+        (( idx++ ))
+
+        time=$(get_time "$idx")
+
+        # The records for every 3 hours are dumped in an array with no
+        # indication to which day they belong.
+        # The first record of each day (except today) is calculated at time
+        # '00:00:00', so we use that to know when a new day starts.
+        [[ $time == "00:00:00" ]] && break
+    done
+
+    [[ $res == "null" ]] && echo $res && return
+
+    LC_NUMERIC=C printf %.0f $res
+}
+
+# Currently, the free accounts on openweathermap.org only get a 5 day forecast
+# with data records for every 3 hours. so we have to compute the temp_min and
+# temp_max manually.
+get_max_property () {
+    local res=0
+
+    local prop="$1"
+    local day="$2"
+
+    local idx
+    idx=$(find_position "$day")
+
+    local time=0
+    local it=0
+
+    while true; do
+        [[ $time == "null" ]] && break
+
+        it=$(jq ".list[$idx]$prop" "$forecast")
+
+	LC_ALL=en_US.UTF-8 printf -v intx '%.*f' 0 $it
+
+	if [ $intx -gt $res ] 
+	then
+		res=$intx
+	fi
+
+        (( idx++ ))
+
+        time=$(get_time "$idx")
+
+        # The records for every 3 hours are dumped in an array with no
+        # indication to which day they belong.
+        # The first record of each day (except today) is calculated at time
+        # '00:00:00', so we use that to know when a new day starts.
+        [[ $time == "00:00:00" ]] && break
+    done
+
+    [[ $res == "null" ]] && echo $res && return
+
+    LC_NUMERIC=C printf %.0f $res
+}
+
 # Certain values cannot be averaged (e.g., the weather description).
 # In that case we just use the value from the first record for that day.
 get_first_property () {
@@ -96,6 +182,52 @@ get_first_property () {
     LC_NUMERIC=C printf %.0f $res
 }
 
+# Currently, the free accounts on openweathermap.org only get a 5 day forecast
+# with data records for every 3 hours. Wheather Icons follow a simple logic, 
+# they go from the best to worst clime. Simple return the biggest number
+get_weather_icon () {
+    local res=0
+
+    local prop="$1"
+    local day="$2"
+
+    local idx
+    idx=$(find_position "$day")
+
+    local it=0
+    local time=0
+    local cond=0
+
+    while true; do
+        [[ $time == "null" ]] && break
+
+        it=$(jq ".list[$idx]$prop" "$forecast")
+
+	it=${it:1:2}
+	LC_ALL=en_US.UTF-8 printf -v intx '%02d' $it
+
+	if [ $intx -gt $res ] 
+	then
+		res=$intx
+		cond=$(jq ".list[$idx].weather[0].id" "$forecast")
+	fi
+
+        (( idx++ ))
+
+        time=$(get_time "$idx")
+
+        # The records for every 3 hours are dumped in an array with no
+        # indication to which day they belong.
+        # The first record of each day (except today) is calculated at time
+        # '00:00:00', so we use that to know when a new day starts.
+        [[ $time == "00:00:00" ]] && break
+    done
+
+    [[ $res == "null" ]] && echo $res && return
+
+    LC_NUMERIC=C printf "%d" $cond
+}
+
 main () {
     type="$1"
     prop="$2"
@@ -105,6 +237,12 @@ main () {
         echo "$(get_avg_property "$2" "$3")"
     elif [[ $type == "first" ]] ; then
         echo "$(get_first_property "$2" "$3")"
+    elif [[ $type == "min" ]] ; then
+        echo "$(get_min_property "$2" "$3")"
+    elif [[ $type == "max" ]] ; then
+        echo "$(get_max_property "$2" "$3")"
+    elif [[ $type == "ico" ]] ; then
+        echo "$(get_weather_icon "$2" "$3")"
     fi
 }
 
