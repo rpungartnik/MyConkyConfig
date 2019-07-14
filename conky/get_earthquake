@@ -1,0 +1,12 @@
+#!/bin/bash
+set -eu
+
+# It seems that in conky the execi command will start before curl has completely
+# written the file. For some reason adding a sleep before calling curl fixes it.
+sleep 2
+
+earthquake_list=~/".cache/earthquake.json"
+
+curl -s "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_day.geojson" -o "$earthquake_list"
+
+

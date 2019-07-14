@@ -1,0 +1,55 @@
+conky.config = {
+	background = false,
+	update_interval = 300,
+	double_buffer = true,
+	no_buffers = true,
+
+	own_window = true,
+	own_window_type = 'normal',
+	own_window_hints = 'undecorated,below,sticky,skip_taskbar,skip_pager',
+	own_window_title = '',
+	own_window_argb_visual = true,
+	own_window_argb_value = 0,
+	own_window_transparent = true,
+
+	gap_x = 0,
+	gap_y = 0,
+
+	border_inner_margin = 15,
+	border_outer_margin = 0,
+
+	draw_shades = false,
+	draw_outline = false,
+	draw_borders = false,
+	draw_graph_borders = false,
+
+	alignment = 'middle_middle',
+
+	use_xft = true,
+	xftalpha = 0,
+	font = 'Open Sans Light:size=10',
+
+	override_utf8_locale = true,
+
+	default_color = 'grey',
+
+-------------------------------------
+--  Max number of earthquakes to display
+--  Leave empty for default(Def:10)
+-------------------------------------
+MaxOccurences=5,
+
+-------------------------------------
+--  Minimum magnutude to display info
+--  Leave empty for default(Def:4.5)
+-------------------------------------
+Magnitude=5
+
+};
+
+conky.text = [[
+${execi 1800 ~/.conky/get_earthquake}
+${font Open Sans Light:size=8}${execi 900 jq -r .metadata.count ~/.cache/earthquake.json} significant earthquakes in the last 24h${font}
+${font Open Sans Light:size=8}${execi 900 ~/.conky/parse_earthquake 5 5}${font}
+${font Open Sans Light:size=6}${execi 900 date +%c}${font}
+]];

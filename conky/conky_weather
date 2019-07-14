@@ -1,6 +1,6 @@
 conky.config = {
 	background = false,
-	update_interval = 1,
+	update_interval = 300,
 	double_buffer = true,
 	no_buffers = true,
 

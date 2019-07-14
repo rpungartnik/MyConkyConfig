@@ -1,6 +1,6 @@
 conky.config = {
 	background = true,
-	update_interval = 1,
+	update_interval = 300,
 
 	cpu_avg_samples = 1,
 	net_avg_samples = 2,
@@ -12,8 +12,8 @@ conky.config = {
 
 	gap_x = 20,
 	gap_y = 10,
-	minimum_width = 310, minimum_height = 600,
-	maximum_width = 900,
+	minimum_width = 310, minimum_height = 330,
+	maximum_width = 600,
 
 	own_window = true,
 	own_window_type = 'normal',
@@ -61,6 +61,6 @@ own_window_colour = '#000000',
 };
 
 conky.text = [[
-${font Ubuntu:size=10:bold}${color4}Market Indexes ${hr 2}
-${execpi 900 /usr/bin/python3 ~/.conky/stock_yahoo.py}
+${font Ubuntu:size=10:bold}${color4}Mercados ${hr 2}
+${execpi 900 /usr/bin/python3 /home/pung/.conky/stock_yahoo.py}
 ]];

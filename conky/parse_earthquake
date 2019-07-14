@@ -1,0 +1,264 @@
+#!/bin/bash
+set -eu
+
+earthquake=~/".cache/earthquake.json"
+
+get_time () {
+    local idx="$1"
+
+    time=$(jq ".list[$idx].dt_txt" "$forecast")
+    time="${time##* }"
+    time="${time%%\"}"
+
+    echo "$time"
+}
+
+find_position () {
+    local day="$1"
+    local pos=0
+    local idx=0
+    local time=""
+
+    [[ $day == 0 ]] && echo "$idx" && return
+
+    while true; do
+        time=$(get_time "$idx")
+
+        [[ $time == "00:00:00" ]] && ((pos++))
+
+        [[ $time == "null" ]] && break
+        [[ $pos == "$day" ]] && break
+
+        ((idx++))
+    done
+
+    echo "$idx"
+}
+
+# Currently, the free accounts on openweathermap.org only get a 5 day forecast
+# with data records for every 3 hours instead of the average value for the day,
+# so we have to compute the average temp_min, temp_max, etc manually.
+get_avg_property () {
+    local res=0
+
+    local prop="$1"
+    local day="$2"
+
+    local idx
+    idx=$(find_position "$day")
+
+    local prop_num=0
+    local time=0
+    local it=0
+
+    while true; do
+        [[ $time == "null" ]] && break
+
+        it=$(jq ".list[$idx]$prop" "$forecast")
+
+        it="$res+$it"
+        res=$(bc -l <<< "$it")
+
+        (( prop_num++ ))
+        (( idx++ ))
+
+        time=$(get_time "$idx")
+
+        # The records for every 3 hours are dumped in an array with no
+        # indication to which day they belong.
+        # The first record of each day (except today) is calculated at time
+        # '00:00:00', so we use that to know when a new day starts.
+        [[ $time == "00:00:00" ]] && break
+    done
+
+    res="$(bc -l <<< "$res/$prop_num")"
+
+    [[ $res == "null" ]] && echo $res && return
+
+    LC_NUMERIC=C printf %.0f $res
+}
+
+# Currently, the free accounts on openweathermap.org only get a 5 day forecast
+# with data records for every 3 hours. so we have to compute the temp_min and
+# temp_max manually.
+get_min_property () {
+    local res=200
+
+    local prop="$1"
+    local day="$2"
+
+    local idx
+    idx=$(find_position "$day")
+
+    local time=0
+    local it=0
+
+    while true; do
+        [[ $time == "null" ]] && break
+
+        it=$(jq ".list[$idx]$prop" "$forecast")
+
+	LC_ALL=en_US.UTF-8 printf -v intx '%.*f' 0 $it
+
+	if [ $intx -lt $res ] 
+	then
+		res=$intx
+	fi
+
+        (( idx++ ))
+
+        time=$(get_time "$idx")
+
+        # The records for every 3 hours are dumped in an array with no
+        # indication to which day they belong.
+        # The first record of each day (except today) is calculated at time
+        # '00:00:00', so we use that to know when a new day starts.
+        [[ $time == "00:00:00" ]] && break
+    done
+
+    [[ $res == "null" ]] && echo $res && return
+
+    LC_NUMERIC=C printf %.0f $res
+}
+
+# Currently, the free accounts on openweathermap.org only get a 5 day forecast
+# with data records for every 3 hours. so we have to compute the temp_min and
+# temp_max manually.
+get_max_property () {
+    local res=0
+
+    local prop="$1"
+    local day="$2"
+
+    local idx
+    idx=$(find_position "$day")
+
+    local time=0
+    local it=0
+
+    while true; do
+        [[ $time == "null" ]] && break
+
+        it=$(jq ".list[$idx]$prop" "$forecast")
+
+	LC_ALL=en_US.UTF-8 printf -v intx '%.*f' 0 $it
+
+	if [ $intx -gt $res ] 
+	then
+		res=$intx
+	fi
+
+        (( idx++ ))
+
+        time=$(get_time "$idx")
+
+        # The records for every 3 hours are dumped in an array with no
+        # indication to which day they belong.
+        # The first record of each day (except today) is calculated at time
+        # '00:00:00', so we use that to know when a new day starts.
+        [[ $time == "00:00:00" ]] && break
+    done
+
+    [[ $res == "null" ]] && echo $res && return
+
+    LC_NUMERIC=C printf %.0f $res
+}
+
+# Certain values cannot be averaged (e.g., the weather description).
+# In that case we just use the value from the first record for that day.
+get_first_property () {
+    local res=0
+
+    local prop="$1"
+    local day="$2"
+
+    local idx
+    idx=$(find_position "$day")
+
+    res=$(jq ".list[$idx]$prop" "$forecast")
+
+    [[ $res == "null" ]] && echo $res && return
+
+    LC_NUMERIC=C printf %.0f $res
+}
+
+# Currently, the free accounts on openweathermap.org only get a 5 day forecast
+# with data records for every 3 hours. Wheather Icons follow a simple logic, 
+# they go from the best to worst clime. Simple return the biggest number
+get_weather_icon () {
+    local res=0
+
+    local prop="$1"
+    local day="$2"
+
+    local idx
+    idx=$(find_position "$day")
+
+    local it=0
+    local time=0
+    local cond=0
+
+    while true; do
+        [[ $time == "null" ]] && break
+
+        it=$(jq ".list[$idx]$prop" "$forecast")
+
+	it=${it:1:2}
+	LC_ALL=en_US.UTF-8 printf -v intx '%02d' $it
+
+	if [ $intx -gt $res ] 
+	then
+		res=$intx
+		cond=$(jq ".list[$idx].weather[0].id" "$forecast")
+	fi
+
+        (( idx++ ))
+
+        time=$(get_time "$idx")
+
+        # The records for every 3 hours are dumped in an array with no
+        # indication to which day they belong.
+        # The first record of each day (except today) is calculated at time
+        # '00:00:00', so we use that to know when a new day starts.
+        [[ $time == "00:00:00" ]] && break
+    done
+
+    [[ $res == "null" ]] && echo $res && return
+
+    LC_NUMERIC=C printf "%d" $cond
+}
+
+get_earthquake_list() {
+    local msg_total=""
+    local Mag=0
+    local Place=0
+    local Tsunami=0
+    local idx=0
+    local DataRaw=0
+    local total_itens=$(jq ".metadata.count" "$earthquake")
+    local Alerta=0
+#    [[ $total_itens > $MaxOccurences ]] && total_itens=$MaxOccurences
+#echo "$MaxOccurences - $total_itens"
+    while true; do
+        Alerta=""
+        DataRaw=$(jq ".features[$idx].properties.time" "$earthquake")
+        Mag=$(jq ".features[$idx].properties.mag" "$earthquake")
+        Place=$(jq ".features[$idx].properties.place" "$earthquake")
+        Tsunami=$(jq ".features[$idx].properties.tsunami" "$earthquake")
+        [[ $Tsunami != 0 ]] && Alerta="(Alerta de Tsuname)"
+msg_total=$(date -d "@${DataRaw::-3}" +"%d %b - %-0H:%M")
+echo "$msg_total - $Mag - $Place$Alerta"
+(( idx++ ))
+[[ $idx == "10" ]] && break
+    done
+#echo $msg_total
+}
+
+main () {
+#    MaxOccurences="$1"
+#    Magnitude="$2"
+
+    echo "$(get_earthquake_list )"
+}
+
+[[ -r $earthquake ]] && main "$@"
