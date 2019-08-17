@@ -32,7 +32,10 @@ conky.config = {
 	override_utf8_locale = true,
 
 	default_color = 'grey',
-
+-- Orange
+	color1 = '#EF5A29',
+-- Grey
+	color2 = 'grey',
 -------------------------------------
 --  Max number of earthquakes to display
 --  Leave empty for default(Def:10)
@@ -49,7 +52,7 @@ Magnitude=5
 
 conky.text = [[
 ${execi 1800 ~/.conky/get_earthquake}
-${font Open Sans Light:size=8}${execi 900 jq -r .metadata.count ~/.cache/earthquake.json} significant earthquakes in the last 24h${font}
-${font Open Sans Light:size=8}${execi 900 ~/.conky/parse_earthquake 5 5}${font}
+${font Ubuntu:size=10:bold}${color1}${execi 900 jq -r .metadata.count ~/.cache/earthquake.json} significant earthquakes in the last 24h ${hr 2}${font}
+${font Open Sans Light:size=8}${color2}${execi 900 ~/.conky/parse_earthquake 5 5}${font}
 ${font Open Sans Light:size=6}${execi 900 date +%c}${font}
 ]];

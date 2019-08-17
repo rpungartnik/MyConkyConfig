@@ -247,7 +247,7 @@ get_earthquake_list() {
         Tsunami=$(jq ".features[$idx].properties.tsunami" "$earthquake")
         [[ $Tsunami != 0 ]] && Alerta="(Alerta de Tsuname)"
 msg_total=$(date -d "@${DataRaw::-3}" +"%d %b - %-0H:%M")
-echo "$msg_total - $Mag - $Place$Alerta"
+echo "   $msg_total - $Mag - $Place$Alerta"
 (( idx++ ))
 [[ $idx == "10" ]] && break
     done
