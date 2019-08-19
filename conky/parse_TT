@@ -1,0 +1,22 @@
+#!/bin/bash
+
+IFS=$'\n'
+base=0
+for line in `curl -s https://trends24.in/brazil/ | lynx -stdin -dump -nonumbers | head -50` ; 
+do
+    if [[ $base == 0 ]]; then
+        if [[ $line == *"Top Twitter trends"* ]]; then
+            base=1
+        fi
+    elif [[ $base == 1 ]]; then
+         base=2
+    else
+        if [[ $line =~ ^[[:space:]] ]]; then
+            if [[ $line == *"."* ]]; then
+                echo "$line"
+            fi
+        else
+            break
+        fi
+    fi
+done
