@@ -2,7 +2,7 @@
 
 IFS=$'\n'
 base=0
-for line in `curl -s https://trends24.in/brazil/ | lynx -stdin -dump -nonumbers | head -50` ; 
+for line in `curl -s $1 | lynx -stdin -dump -nonumbers | head -50` ; 
 do
     if [[ $base == 0 ]]; then
         if [[ $line == *"Top Twitter trends"* ]]; then
