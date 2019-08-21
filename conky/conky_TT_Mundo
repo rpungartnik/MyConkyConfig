@@ -1,0 +1,45 @@
+conky.config = {
+	background = false,
+	update_interval = 300,
+	double_buffer = true,
+	no_buffers = true,
+
+	own_window = true,
+	own_window_type = 'normal',
+	own_window_hints = 'undecorated,below,sticky,skip_taskbar,skip_pager',
+	own_window_title = '',
+	own_window_argb_visual = true,
+	own_window_argb_value = 0,
+	own_window_transparent = true,
+
+	gap_x = -150,
+	gap_y = 70,
+
+	border_inner_margin = 15,
+	border_outer_margin = 0,
+
+	draw_shades = false,
+	draw_outline = false,
+	draw_borders = false,
+	draw_graph_borders = false,
+
+	alignment = 'bottom_middle',
+
+	use_xft = true,
+	xftalpha = 0,
+	font = 'Open Sans Light:size=10',
+
+	override_utf8_locale = true,
+
+	default_color = 'grey',
+-- Orange
+	color1 = '#EF5A29',
+-- Grey
+	color2 = 'grey',
+};
+
+conky.text = [[
+${font Ubuntu:size=10:bold}${color1}Trending Topics Mundo${hr 2}${font}
+${font Open Sans Light:size=8}${color2}${execi 1800 ~/.conky/parse_TT https://trends24.in}${font}
+${font Open Sans Light:size=6}${execi 900 date +%c}${font}
+]];
