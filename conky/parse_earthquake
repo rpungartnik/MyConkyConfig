@@ -12,8 +12,8 @@ get_earthquake_list() {
     local DateRaw=0
     local total_itens=$(jq ".metadata.count" "$earthquake")
     local Alerta=0
-#    [[ $total_itens > $MaxOccurences ]] && total_itens=$MaxOccurences
-#echo "$MaxOccurences - $total_itens"
+
+    [[ $total_itens -gt 12 ]] && total_itens=12
 
     while [ $idx -lt $total_itens ]; do
         Alerta=""
